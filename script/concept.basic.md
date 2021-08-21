@@ -1,69 +1,8 @@
-### 모듈
-* 자바스크립트 파일 하나, 전체를 이루는 부품 하나하나
-* 모듈이 모여서 하나의 프로그램을 이룸
-* `require`명령어를 통해 모듈을 불러옴
-  * 모듈을 로드할 때 `.js`확장자 없이 파일 이름만 적어도 됨
-  * `require`함수가 리턴하는 객체는 상수 `const`로 대입하는 게 좋음
-  * 모듈이 리턴한 객체를 변수로 받으면, 나중에 본인 또는 다른 개발자가 변수 m에 다른 값을 실수로 다시 지정하게 될 수도 있지만, 상수로 받으면 상수 m에 새로운 값을 다시 지정하려는 코드 자체에서 에러가 발생하므로 방지 가능 
-* 모듈의 함수를 외부에서 사용하기 위해선 `exports` 명령어를 사용해 외부에 공개
-  * `exports.add = add;`
-* 공개하고 싶은 것들을 모아 한의 객체로 만들고 `module.exports`로 객체를 통째로 외부에 공개
-  * `module.exports = calculator;`
-* ex) math-tools.js
-
-### 함수를 나타내는 새로운 방식, Arrow Function
-* Function Declaration(함수 선언식)
-  ```js
-    function add(a,b){
-        return a+b;
-    };
-  ```
-* Function Expression(함수 표현식)
-  ```js
-  const add = function(a,b){
-      return a+b;
-  };
-  ```
-
-  ```js
-    const add = (a, b) => {
-      return a+b;
-    };
-  ```
-* 활용
-  ```js
-    const arr = [1,2,3,4,5];
-
-    function getSquare(x) {
-        return x * x;
-    }
-
-    const newArr = arr.map(getSquare);
-    console.log(newArr);
-  ```
-  * getSquare라는 함수를 별도로 선언하지 않고 다음과 같이 사용 가능
-  ```js
-  const arr = [1,2,3,4,5];
-
-  const newwArr = arr.map(function(x){
-      return x * x;
-  });
-
-  console.log(newArr);
-  ```
-  * map 함수에 인자로 들어간 함수는 아예 이름이 없고, 내용은 getSquare 함수의 바디와 똑같음
-  * 이렇게 이름이 없는 함수를 Anonymous Function(익명 함수)라고 하는데, 보통 함수에 함수를 인자로 넣을 때 많이 사용
-  ```js
-  const arr = [1,2,3,4,5];
-
-  const newArr = arr.map((x)=>{
-      return x * x;
-  });
-  ```
 ### 비동기 실행
 > 특정 작업이 완료되었을 때 실행할 콜백을 등록해두고 바로 다음 코드로 실행을 넘기는 것
 * nodejs에선 보통 비동기 함수를 사용하고 특수한 경우에만 동기 함수를 사용함
-
+* 비동기 프로그래밍은 **비동기 함수**를 사용하거나 **EventEmitter 객체**를 사용함으로써 할 수 있음
+* 
 **setTimeout()**
 ```js
 setTimeout(callback, milliseconds)
@@ -103,3 +42,33 @@ setTimeout(() => {
 ![](https://bakey-api.codeit.kr/api/files/resource?root=static&seqId=3753&directory=Untitled%2012.png&name=Untitled+12.png)
 * 위의 그림에서 Node.js의 메인 스레드는 이 14분짜리 작업을 끝내기 전에는 다른 클라이언트의 요청을 처리하지 못하게 됨. File I/O 작업은 다른 스레드에게 맡길 수 있지만 CPU 수치 계산은 메인 스레드에서 수행하도록 설계되었기 때문 
 * 따라서 Node.js는 CPU-intesive job(고화질 이미지 처리, 복잡한 시뮬레이션 계산, 딥러닝 작업 등)에는 적절치 않음 
+
+### 비동기 함수의 콜백이 실행되는 원리
+
+```js
+let num = 1;
+
+setTimeout(() => {
+  num = 2;
+}, 0); // 1000 -> 0 밀리세컨즈로 수정
+
+num = 3;
+
+console.log(num);
+```
+-> 위의 코드에서 num은 '2'가 아닌 '3'으로 출력이 됨
+
+![](https://bakey-api.codeit.kr/api/files/resource?root=static&seqId=3765&directory=Untitled.png&name=Untitled.png)
+
+node는
+* 하나의 스레드로 자바스크립트 코드를 차례대로 실행하고
+* 그 스레드는 그 후에 바로 Event Loop를 돌게 됨
+
+Event Loop는 각종 콜백들의 실행 조건(특정 시간이 경과했는지 등)을 확인하고, 실제로 콜백을 실행하는 로직을 말함. Event Loop는 특정 콜백의 실행 조건이 만족된 것을 확인하면 Queue에 콜백을 삽입함 
+
+![](https://bakey-api.codeit.kr/api/files/resource?root=static&seqId=3765&directory=Untitled%204.png&name=Untitled+4.png)
+node는 자바스크립트 코드를 하나의 스레드로 실행함. 이때 중요한 것은 지금 setTimeOut에 있는 콜백을 실행해도 되는지 (0초가 지났는지)에 대한 **판단을 하는 것은 아님!** 이 순간에는 단지 콜백을 등록만 함. 따라서 2번에서 콜백을 등록하고 연이어 3번과 4번이 실행됨.  
+
+Node로 자바스크립트 파일을 실행하면 다음과 같은 일들이 수행됨.  
+* 1단계: 하나의 스레드가 자바스크립트 코드를 실행하고
+* 2단계: 그 후에, 그 스레드가 Event Loop라는 로직에서 각각의 콜백들에 대한 실행 여부를 판단하고 Queue에 넣은 후 Queue에 담긴 콜백들을 실행 
