@@ -1,0 +1,21 @@
+GET http://localhost:3000/api/members/
+
+###
+POST http://localhost:3000/api/members
+Content-Type: application/json
+
+{
+    "id":4,
+    "name":"Zake",
+    "team":"engineering"
+}
+
+### 
+PUT  http://localhost:3000/api/members/1
+Content-Type: application/json
+
+{
+    "id":1,
+    "name":"mihea",
+    "team":"developer"
+}

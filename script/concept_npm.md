@@ -99,6 +99,18 @@ npm update [패키지명]
 
 일부 패키지의 경우, 최신 버전으로 업데이트하기 전에 별도의 검토가 필요해서 모든 패키지를 최신의것으로 바꾸면 안되는 경우 특정 패키지만 업데이트
 
+```js
+npm install [패키지명] --save-dev
+```
+
+개발용도로만 필요한 패키지를 설치할 때 사용, `pakage.json`에 `devDependencies`에 추가됨
+
+```js
+npm install --production
+```
+
+`devDendencies`에 있는 패키지들(개발 용도로만 필요하고 배포 용도로는 필요하지 않는 패키지들)은 제외하고 `dependencies`에 있는 패키지들만 node_modules 디렉토리에 설치하게 됨
+
 ### npm과 yarn
 
 - yarn: npm의 느린 속도 등을 해결하기 위해 페이스북에서 제작, 오프라인 캐시(한번 설치한 패키지를 계속 보관해두는 기능) 등의 추가 기능 탑재
