@@ -1,7 +1,7 @@
 const express = require("express");
 
 const app = express();
-const members = require("./members");
+let members = require("./members");
 
 /**
  * middleware
@@ -50,6 +50,17 @@ app.put("/api/members/:id", (req, res) => {
     res.send(member);
   } else {
     res.status(404).send({ message: "Thers is no member with the id!" });
+  }
+});
+
+app.delete("/api/members/:id", (req, res) => {
+  const { id } = req.params;
+  const membersCount = members.length;
+  members = members.filter((member) => member.id !== Number(id)); //id와 일치하지 않는 요소들만 추려서 새로운 배열을 만듦
+  if (members.length < membersCount) {
+    res.send({ message: "Deleted" });
+  } else {
+    res.status(404).send({ message: "There is no member with the id!" });
   }
 });
 
