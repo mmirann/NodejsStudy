@@ -1,7 +1,9 @@
 const express = require("express");
 
 const app = express();
-let members = require("./members");
+const db = require("./models"); //모듈을 찾을 때 index를 자동으로 불러옴
+
+const { Member } = db;
 
 /**
  * middleware
